@@ -28,22 +28,26 @@ func main() {
 
 func sayhello(w http.ResponseWriter, r *http.Request) {
 
-	lst := []string{}
-
 	database, _ := sql.Open("sqlite3", "./test.db")
 	statement, _ := database.Prepare("CREATE TABLE IF NOT EXISTS city(id INTEGER PRIMARY KEY, name_city TEXT)")
 	statement.Exec()
 
-	rows, _ := database.Query("SELECT name_city FROM city")
+	rows, _ := database.Query("SELECT id,name_city FROM city")
 
-	var city string
+	var id string
+	var name_city string
+
+	d := make(map[string]string)
 
 	for rows.Next() {
-		rows.Scan(&city)
-		lst = append(lst, city)
+
+		rows.Scan(&id, &name_city)
+
+		d[id] = name_city
+
 	}
 
-	tpl.ExecuteTemplate(w, "index.gohtml", lst)
+	tpl.ExecuteTemplate(w, "index.gohtml", d)
 
 }
 
