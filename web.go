@@ -1,9 +1,10 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
+	_ "github.com/mattn/go-sqlite3"
 	"net/http"
-	"strconv"
 	"strings"
 	"text/template"
 )
@@ -29,10 +30,17 @@ func sayhello(w http.ResponseWriter, r *http.Request) {
 
 	lst := []string{}
 
-	for i := 0; i < 100; i++ {
+	database, _ := sql.Open("sqlite3", "./test.db")
+	statement, _ := database.Prepare("CREATE TABLE IF NOT EXISTS city(id INTEGER PRIMARY KEY, name_city TEXT)")
+	statement.Exec()
 
-		lst = append(lst, strconv.Itoa(i))
+	rows, _ := database.Query("SELECT name_city FROM city")
 
+	var city string
+
+	for rows.Next() {
+		rows.Scan(&city)
+		lst = append(lst, city)
 	}
 
 	tpl.ExecuteTemplate(w, "index.gohtml", lst)
@@ -51,3 +59,4 @@ func HelloServer(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprintf(w, "<title>%v</title><h1>%v</h1>", last_chars_url, last_chars_url)
 }
+
