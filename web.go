@@ -3,10 +3,11 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/mattn/go-sqlite3"
 	"net/http"
 	"strings"
 	"text/template"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 var tpl *template.Template
@@ -26,28 +27,31 @@ func main() {
 
 }
 
+type City struct {
+	ID       int
+	NameCity string
+}
+
 func sayhello(w http.ResponseWriter, r *http.Request) {
 
 	database, _ := sql.Open("sqlite3", "./test.db")
-	statement, _ := database.Prepare("CREATE TABLE IF NOT EXISTS city(id INTEGER PRIMARY KEY, name_city TEXT)")
+	statement, _ := database.Prepare("CREATE TABLE IF NOT EXISTS city (id INTEGER PRIMARY KEY, name_city TEXT)")
 	statement.Exec()
-
+	//statement, _ = database.Prepare("INSERT INTO city (name_city) VALUES (?)")
+	//statement.Exec("Test123")
 	rows, _ := database.Query("SELECT id,name_city FROM city")
 
-	var id string
-	var name_city string
-
-	d := make(map[string]string)
+	var (
+		cities []City
+		city   City
+	)
 
 	for rows.Next() {
-
-		rows.Scan(&id, &name_city)
-
-		d[id] = name_city
-
+		rows.Scan(&city.ID, &city.NameCity)
+		cities = append(cities, city)
 	}
 
-	tpl.ExecuteTemplate(w, "index.gohtml", d)
+	tpl.ExecuteTemplate(w, "index.gohtml", cities)
 
 }
 
