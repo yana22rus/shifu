@@ -10,12 +10,22 @@
     <input type="text" placeholder="add city" name="city">
     <input type="submit">
 </form>
-<form action="delete">
-{{range .}}
-{{.ID}} {{.NameCity}} <br>
-{{end}}
-    <input type="submit">
-</form>
+
+<table>
+
+        {{range .}}
+            <tr>
+        <td>{{.ID}}</td>
+        <td>{{.NameCity}}</td>
+
+
+        <form action="/delete">
+            <td><input type="submit" value="Удалить" name="{{.ID}}"></td>
+        </form>
+    </tr>
+        {{end}}
+
+</table>
 </body>
 </html>
 
