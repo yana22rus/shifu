@@ -23,6 +23,8 @@ func main() {
 	http.HandleFunc("/", sayhello)
 	http.HandleFunc("/bye", saybye)
 	http.HandleFunc("/create", create)
+	http.HandleFunc("/edit", edit)
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	http.HandleFunc("/delete", delete)
 	http.HandleFunc("/test/", HelloServer)
 	http.ListenAndServe(":8000", nil)
@@ -30,7 +32,7 @@ func main() {
 }
 
 type City struct {
-	ID       int
+	ID       string
 	NameCity string
 }
 
@@ -49,6 +51,25 @@ func create(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func edit(w http.ResponseWriter, r *http.Request) {
+
+	database, _ := sql.Open("sqlite3", "./test.db")
+	statement, _ := database.Prepare("CREATE TABLE IF NOT EXISTS city (id INTEGER PRIMARY KEY, name_city TEXT)")
+	statement.Exec()
+
+	if r.Method != "POST" {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		var id, input string
+		input = r.FormValue("input_data")
+		id = r.FormValue("edit_data")
+		fmt.Println(input)
+		fmt.Println(id)
+		statement, _ = database.Prepare(fmt.Sprintf(`UPDATE city SET name_city=%v WHERE ID = %v`, input, id))
+		statement.Exec()
+
+	}
+}
+
 func delete(w http.ResponseWriter, r *http.Request) {
 
 	database, _ := sql.Open("sqlite3", "./test.db")
@@ -57,8 +78,8 @@ func delete(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "POST" {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
-		fmt.Println("zzz")
-		statement, _ = database.Prepare(`DELETE FROM city WHERE  name_city  = "Simf"`)
+		input := r.FormValue("del")
+		statement, _ = database.Prepare(fmt.Sprintf(`DELETE FROM city WHERE  id  = %v`, input))
 		statement.Exec()
 
 	}

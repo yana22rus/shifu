@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="static/style.css">
+
 </head>
 <body>
 <form action="/create">
@@ -13,19 +15,42 @@
 
 <table>
 
-        {{range .}}
-            <tr>
-        <td>{{.ID}}</td>
-        <td>{{.NameCity}}</td>
+    {{range .}}
+        <tr>
+            <td>{{.ID}}</td>
+            <td>{{.NameCity}}</td>
+            <td><button name="{{.NameCity}}" id ="{{.ID}}" onclick="edit_value(this.id,this.name)"><a href="#openModal">Редактироать</a></button></td>
 
 
-        <form action="/delete">
-            <td><input type="submit" value="Удалить" name="{{.ID}}"></td>
+            <form action="/delete">
+                <input type="hidden" value="{{.ID}}" name="del">
+                <td><input type="submit" value="Удалить" name="{{.ID}}"></td>
+            </form>
+        </tr>
         </form>
-    </tr>
-        {{end}}
+    {{end}}
 
 </table>
+
+<div id="openModal" class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Название</h3>
+                <a href="#close" title="Close" class="close">×</a>
+            </div>
+            <div class="modal-body"  id="input_form">
+                <form action="/edit">
+                <input type="text" id="input_data" name="input_data">
+                <input type="hidden" name="edit_data" value="" id="edit_data">
+                    <input type="submit" value="Изменить">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="static/script.js"></script>
 </body>
 </html>
-
