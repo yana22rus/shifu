@@ -3,11 +3,10 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	_ "github.com/mattn/go-sqlite3"
 	"net/http"
 	"strings"
 	"text/template"
-
-	_ "github.com/mattn/go-sqlite3"
 )
 
 var tpl *template.Template
@@ -59,12 +58,9 @@ func edit(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "POST" {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
-		var id, input string
-		input = r.FormValue("input_data")
-		id = r.FormValue("edit_data")
-		fmt.Println(input)
-		fmt.Println(id)
-		statement, _ = database.Prepare(fmt.Sprintf(`UPDATE city SET name_city=%v WHERE ID = %v`, input, id))
+		input := r.FormValue("input_data")
+		id := r.FormValue("edit_data")
+		statement, _ = database.Prepare(fmt.Sprintf(`UPDATE city SET name_city="%v" WHERE ID ="%v"`, input, id))
 		statement.Exec()
 
 	}
